@@ -1,4 +1,5 @@
 import type { Section as SectionType } from '../data/sections';
+import { sections } from '../data/sections';
 import { StepList } from './StepList';
 import { TerminalDemo } from './TerminalDemo';
 import { Callout } from './Callout';
@@ -22,7 +23,7 @@ export function Section({ section, index }: Props) {
         <div className="flex items-center gap-2 mb-2">
           {index > 0 && (
             <span className="text-xs font-mono text-[#8b949e] bg-[#161b22] border border-[#30363d] px-2 py-0.5 rounded">
-              {index} / {7}
+              {index} / {sections.length - 1}
             </span>
           )}
         </div>

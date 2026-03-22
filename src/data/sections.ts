@@ -66,6 +66,40 @@ export const sections: Section[] = [
     },
   },
   {
+    id: 'how-llms-work',
+    title: 'How LLMs Work',
+    emoji: '🧠',
+    tagline: 'Why AI is surprisingly good at writing code',
+    content: {
+      intro:
+        "Before we get into Claude Code specifically, it helps to understand what's actually happening under the hood. Large Language Models (LLMs) like Claude are neural networks trained on enormous amounts of text — including a huge chunk of the world's publicly available code.",
+      steps: [
+        {
+          label: "What is an LLM?",
+          note: "An LLM is a statistical model that predicts the most likely next token (word or word-piece) given everything that came before. It's trained by reading billions of documents and learning patterns. It's not \"thinking\" the way you are — but the patterns it has learned are remarkably sophisticated.",
+        },
+        {
+          label: "Why are LLMs good at code specifically?",
+          note: "Code is unusually structured and consistent. It has strict syntax, predictable patterns, and the internet has billions of examples with explanations alongside them (Stack Overflow, GitHub, tutorials). LLMs have seen more code examples — with context — than any human could read in a thousand lifetimes.",
+        },
+        {
+          label: "What is 'context'?",
+          code: "┌─────────────────────────────────────────┐\n│  CONTEXT WINDOW                         │\n│                                         │\n│  [Your files]  [Chat history]           │\n│  [Instructions]  [Tool results]         │\n│                                         │\n│  ← Everything Claude can \"see\" right now│\n└─────────────────────────────────────────┘",
+          language: "text",
+          note: "The context window is Claude's working memory for a session. It holds your files, your conversation, and any tool results. Older content gets pushed out as new content comes in. Claude has no memory between sessions unless you provide it.",
+        },
+        {
+          label: "Context has a size limit",
+          note: "Claude Sonnet 4.6 has a ~200,000 token context window. That sounds big (roughly 150,000 words), but large codebases fill it fast. When context fills up, older parts are dropped — Claude can 'forget' earlier instructions or files it read.",
+        },
+      ],
+      callout: {
+        type: 'info',
+        text: 'The practical implication: be intentional about what you put in context. Point Claude at relevant files rather than your whole repo. Use /compact to summarize and free up space. Use CLAUDE.md to give persistent instructions that load every session.',
+      },
+    },
+  },
+  {
     id: 'what-is-claude-code',
     title: 'What is Claude Code?',
     emoji: '🤖',
@@ -192,6 +226,52 @@ export const sections: Section[] = [
     },
   },
   {
+    id: 'plan-mode',
+    title: 'Plan Mode',
+    emoji: '📐',
+    tagline: 'Think before you type — and make Claude do the same',
+    content: {
+      intro:
+        "One of the most common mistakes with AI coding tools is jumping straight to implementation. Claude Code has a built-in \"plan mode\" that forces a think-first workflow: Claude reads the codebase, asks clarifying questions, and writes a structured plan before touching a single file.",
+      steps: [
+        {
+          label: "Enter plan mode",
+          code: "/plan\n\n# or just ask:\n> Before you write any code, make a plan for how you'd\n> implement user authentication in this app.",
+          language: "text",
+          note: "In plan mode, Claude can read files and search the codebase but cannot write or edit anything.",
+        },
+        {
+          label: "What a good plan looks like",
+          code: "## Plan: Add User Authentication\n\n### Context\nThis Express API currently has no auth. We need JWT-based\nlogin with protected routes.\n\n### Approach\n1. Install jsonwebtoken, bcrypt\n2. Add User model (id, email, passwordHash)\n3. POST /auth/register — hash password, create user\n4. POST /auth/login — verify password, return JWT\n5. Middleware: verifyToken() for protected routes\n\n### Files to modify\n- src/routes/ (add auth.ts)\n- src/middleware/ (add auth.ts)\n- src/models/ (add user.ts)\n\n### Tests\n- register with valid/invalid input\n- login success/failure\n- protected route with/without token",
+          language: "markdown",
+        },
+        {
+          label: "Approve or adjust the plan",
+          note: "Review the plan. Ask Claude to change the approach if needed. Once you're happy, approve it — Claude exits plan mode and starts implementing. This one step catches most mistakes before any code is written.",
+        },
+      ],
+      terminal: [
+        { type: 'prompt', text: 'add authentication to this app' },
+        { type: 'claude', text: '● Entering plan mode...' },
+        { type: 'claude', text: '● Reading src/routes/ (4 files)' },
+        { type: 'claude', text: '● Reading src/models/ (2 files)' },
+        { type: 'blank', text: '' },
+        { type: 'output', text: '  I have a few questions before I start:' },
+        { type: 'output', text: '  1. JWT or session-based auth?' },
+        { type: 'output', text: '  2. Is there an existing User model?' },
+        { type: 'output', text: '  3. Should /admin routes require a role check?' },
+        { type: 'blank', text: '' },
+        { type: 'prompt', text: 'JWT, no existing User model, yes admin needs role:admin' },
+        { type: 'claude', text: '● Writing plan...' },
+        { type: 'output', text: '  [Plan written — awaiting approval]' },
+      ],
+      callout: {
+        type: 'tip',
+        text: 'Use plan mode for anything non-trivial: new features, refactors, migrations. It\'s free — the tokens spent planning save far more tokens (and time) in back-and-forth fixing mistakes.',
+      },
+    },
+  },
+  {
     id: 'tdd',
     title: 'TDD with Claude Code',
     emoji: '🧪',
@@ -276,6 +356,50 @@ export const sections: Section[] = [
       callout: {
         type: 'warning',
         text: 'Multiagent flows are powerful but tricky — agents can conflict if they edit the same file. Design your tasks so workers have clear, non-overlapping scopes.',
+      },
+    },
+  },
+  {
+    id: 'tokens-and-cost',
+    title: 'Tokens & Cost',
+    emoji: '💰',
+    tagline: 'Understanding what you\'re paying for — and how to spend less',
+    content: {
+      intro:
+        "Claude Code is a paid tool — it uses the Claude API, which charges per token. A token is roughly ¾ of a word. Understanding tokens helps you use Claude Code efficiently and avoid surprise bills.",
+      steps: [
+        {
+          label: "What is a token?",
+          code: "\"Hello, world!\"  →  4 tokens\n\"function\"       →  1 token\n\"getUserByEmail\" →  4 tokens\n\"import React from 'react'\" → 6 tokens\n\n~750 words ≈ 1,000 tokens",
+          language: "text",
+          note: "Code is generally more token-dense than prose because of identifiers, brackets, and punctuation.",
+        },
+        {
+          label: "How Claude Code is billed",
+          code: "Input tokens  = everything Claude reads (files, history, instructions)\nOutput tokens = everything Claude writes (responses, code edits)\n\nInput is cheaper than output.\nClaude Sonnet 4.6: ~$3 / 1M input, ~$15 / 1M output",
+          language: "text",
+          note: "A typical coding session with Claude Code might use 50,000–200,000 tokens. At Sonnet pricing that's roughly $0.15–$0.60 per session.",
+        },
+        {
+          label: "Keep costs down: use /compact",
+          code: "/compact",
+          language: "text",
+          note: "This summarizes your conversation history into a shorter form, freeing context space and reducing input tokens on future turns. Run it every 20–30 turns in a long session.",
+        },
+        {
+          label: "Keep costs down: be specific",
+          code: "# Expensive: vague, forces Claude to read everything\n> fix the bug\n\n# Cheaper: specific, Claude reads only what's needed\n> the login route at src/routes/auth.ts:42 is returning\n> 403 for valid tokens — fix it",
+          language: "text",
+          note: "Vague prompts cause Claude to read more files to orient itself. Specific prompts reduce input tokens.",
+        },
+        {
+          label: "Set a budget and monitor usage",
+          note: "The Anthropic Console (console.anthropic.com) shows your usage in real time. You can set a monthly spend limit to avoid surprises. Claude Code also shows a running token count in the session header.",
+        },
+      ],
+      callout: {
+        type: 'warning',
+        text: 'Multiagent flows multiply your token usage — each agent has its own context and uses tokens independently. A 5-agent parallel workflow costs roughly 5x a single-agent session. Great for speed, but watch the meter.',
       },
     },
   },
