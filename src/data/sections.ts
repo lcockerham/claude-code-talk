@@ -10,6 +10,12 @@ export interface TerminalLine {
   text: string;
 }
 
+export interface ResourceLink {
+  label: string;
+  url: string;
+  description: string;
+}
+
 export interface Section {
   id: string;
   title: string;
@@ -21,6 +27,7 @@ export interface Section {
     terminal?: TerminalLine[];
     callout?: { type: 'tip' | 'info' | 'warning'; text: string };
     extra?: string;
+    links?: ResourceLink[];
   };
 }
 
@@ -122,6 +129,12 @@ export const sections: Section[] = [
           label: "That's it. You're in.",
           note: "Claude Code reads your project files and is ready to help.",
         },
+        {
+          label: "The harness matters as much as the model",
+          code: "Model alone:    ██████░░░░  ~60% on SWE-bench\nWith harness:   ██████████  ~90%+ on SWE-bench\n\n            (same model, different wrapper)",
+          language: "text",
+          note: "Studies on coding benchmarks show that the scaffolding around a model — how it reads files, calls tools, retries errors, and manages context — can have a multiplicative impact beyond what the model achieves alone. Claude Code is Anthropic's answer to that harness problem.",
+        },
       ],
       terminal: [
         { type: 'prompt', text: 'claude' },
@@ -207,6 +220,12 @@ export const sections: Section[] = [
           code: '# .claude/settings.json\n{\n  "mcpServers": {\n    "github": {\n      "command": "npx",\n      "args": ["@anthropic-ai/mcp-server-github"]\n    }\n  }\n}',
           language: "json",
           note: "MCP (Model Context Protocol) lets Claude read GitHub issues, Notion pages, databases, and more",
+        },
+        {
+          label: "CLI vs MCP: which one do you actually need?",
+          code: "# Use a plain CLI tool when:\n#  - the tool already has a good CLI (git, gh, curl, jq)\n#  - you just need Claude to run a command and read stdout\n#  - one-shot: fetch this, run that, move on\n\n> run the test suite and tell me what failed\n# Claude calls: npm test  ← plain shell, no MCP needed\n\n# Use MCP when:\n#  - you need structured/typed data back (not raw text)\n#  - the tool has no CLI (Notion, Linear, Figma)\n#  - Claude needs to search, paginate, or react to results\n#  - you want Claude to stay in a conversation with the service\n\n> find all open GitHub issues labeled 'bug' and triage them\n# Claude uses: mcp-server-github → typed Issue objects",
+          language: "bash",
+          note: "Rule of thumb: if a junior dev would just shell out to it, Claude can too. Reach for MCP when the interaction is richer than a single command.",
         },
       ],
       terminal: [
@@ -434,6 +453,46 @@ export const sections: Section[] = [
       callout: {
         type: 'info',
         text: 'The meta-lesson: Claude Code isn\'t just for writing functions. It\'s for building entire things — and the workflow (plan → scaffold → build → deploy) is the same whether you\'re making a site or a production system.',
+      },
+    },
+  },
+  {
+    id: 'more-learning',
+    title: 'More Learning',
+    emoji: '📚',
+    tagline: 'Go deeper — the best people to follow as this field moves fast',
+    content: {
+      intro:
+        "AI-assisted development is moving quickly. These are the writers, researchers, and practitioners worth following if you want to stay sharp.",
+      links: [
+        {
+          label: "Simon Willison's Blog",
+          url: "https://simonwillison.net",
+          description:
+            "The most consistently useful writing on LLMs and AI tools in the wild. Simon builds with AI constantly and writes up what he learns — practical, honest, and prolific.",
+        },
+        {
+          label: "Andrej Karpathy",
+          url: "https://karpathy.ai",
+          description:
+            "Former Tesla AI director and OpenAI founding member. His YouTube series on neural networks and LLMs (\"Neural Networks: Zero to Hero\") is the best technical foundation available for free.",
+        },
+        {
+          label: "Boris Cherny on X",
+          url: "https://x.com/bcherny",
+          description:
+            "Sharp takes on AI tooling, agent design, and software engineering in the LLM era. Good signal-to-noise for practitioners who want the engineering perspective.",
+        },
+        {
+          label: "AI Engineering — Chip Huyen",
+          url: "https://www.oreilly.com/library/view/ai-engineering/9781098166298/",
+          description:
+            "The definitive book on building production AI systems. Covers RAG, fine-tuning, evaluation, and deployment. If you're serious about putting LLMs into real products, start here.",
+        },
+      ],
+      callout: {
+        type: 'tip',
+        text: "The field moves fast enough that blog posts and X threads are often more current than books. Follow people who build things, not just people who write about building things.",
       },
     },
   },

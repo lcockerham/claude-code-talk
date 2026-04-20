@@ -53,6 +53,25 @@ export function Section({ section, index }: Props) {
         <p className="text-[#8b949e] text-xs mt-4 leading-relaxed">{content.extra}</p>
       )}
 
+      {/* Resource links */}
+      {content.links && (
+        <ul className="space-y-4 mt-6">
+          {content.links.map((link) => (
+            <li key={link.url} className="border border-[#30363d] rounded-lg p-4 bg-[#0d1117]">
+              <a
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#58a6ff] font-semibold text-sm hover:underline"
+              >
+                {link.label} ↗
+              </a>
+              <p className="text-[#8b949e] text-xs mt-1 leading-relaxed">{link.description}</p>
+            </li>
+          ))}
+        </ul>
+      )}
+
       {/* Vote panel for live demo section */}
       {id === 'live-demo' && <VotePanel />}
     </section>
