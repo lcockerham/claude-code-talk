@@ -74,35 +74,37 @@ export const sections: Section[] = [
   },
   {
     id: 'how-llms-work',
-    title: 'How LLMs Work',
+    title: 'Claude Code vs. Just Using ChatGPT',
     emoji: '🧠',
-    tagline: 'Why AI is surprisingly good at writing code',
+    tagline: 'Same underlying model — very different results. Here\'s why the wrapper matters.',
     content: {
       intro:
-        "Before we get into Claude Code specifically, it helps to understand what's actually happening under the hood. Large Language Models (LLMs) like Claude are neural networks trained on enormous amounts of text — including a huge chunk of the world's publicly available code.",
+        "You've probably used ChatGPT or Claude in a browser. Claude Code uses the same underlying model — so why is it dramatically better for coding? The answer is the harness: the scaffolding that connects the model to your actual project.",
       steps: [
         {
-          label: "What is an LLM?",
-          note: "An LLM is a statistical model that predicts the most likely next token (word or word-piece) given everything that came before. It's trained by reading billions of documents and learning patterns. It's not \"thinking\" the way you are — but the patterns it has learned are remarkably sophisticated.",
+          label: "A chatbot sees what you paste. Claude Code sees your project.",
+          note: "When you paste code into ChatGPT, you're manually copying context. Claude Code reads your files directly — it can see the entire codebase, run your tests, read error output, and make edits. It's the difference between describing a problem and showing it.",
         },
         {
-          label: "Why are LLMs good at code specifically?",
-          note: "Code is unusually structured and consistent. It has strict syntax, predictable patterns, and the internet has billions of examples with explanations alongside them (Stack Overflow, GitHub, tutorials). LLMs have seen more code examples — with context — than any human could read in a thousand lifetimes.",
+          label: "The harness multiplies the model's capability",
+          code: "Model alone:    ██████░░░░  ~60% on SWE-bench\nWith harness:   ██████████  ~90%+ on SWE-bench\n\n            (same model, different wrapper)",
+          language: "text",
+          note: "SWE-bench measures whether AI can fix real GitHub issues end-to-end. The same Claude model jumps from ~60% to 90%+ just by adding a proper tool-use harness. Scaffolding matters as much as the model itself.",
         },
         {
-          label: "What is 'context'?",
+          label: "Claude Code has tools. A chatbot doesn't.",
+          note: "Claude Code can read files, write files, run shell commands, search your codebase, and call external services — all in a loop. A browser chatbot can only generate text. Tool use is what turns a language model into an agent.",
+        },
+        {
+          label: "The context window: Claude's working memory",
           code: "┌─────────────────────────────────────────┐\n│  CONTEXT WINDOW                         │\n│                                         │\n│  [Your files]  [Chat history]           │\n│  [Instructions]  [Tool results]         │\n│                                         │\n│  ← Everything Claude can \"see\" right now│\n└─────────────────────────────────────────┘",
           language: "text",
-          note: "The context window is Claude's working memory for a session. It holds your files, your conversation, and any tool results. Older content gets pushed out as new content comes in. Claude has no memory between sessions unless you provide it.",
-        },
-        {
-          label: "Context has a size limit",
-          note: "Claude Sonnet 4.6 has a ~200,000 token context window. That sounds big (roughly 150,000 words), but large codebases fill it fast. When context fills up, older parts are dropped — Claude can 'forget' earlier instructions or files it read.",
+          note: "Claude Sonnet 4.6 has a ~200k token context window (~150k words). Large codebases fill it fast. Use /compact to free up space, and CLAUDE.md to give persistent instructions that reload every session.",
         },
       ],
       callout: {
         type: 'info',
-        text: 'The practical implication: be intentional about what you put in context. Point Claude at relevant files rather than your whole repo. Use /compact to summarize and free up space. Use CLAUDE.md to give persistent instructions that load every session.',
+        text: 'Mental model: Claude Code is Claude with eyes (file reading), hands (file editing), and legs (shell commands). A browser chatbot is Claude in a box.',
       },
     },
   },
@@ -127,13 +129,7 @@ export const sections: Section[] = [
         },
         {
           label: "That's it. You're in.",
-          note: "Claude Code reads your project files and is ready to help.",
-        },
-        {
-          label: "The harness matters as much as the model",
-          code: "Model alone:    ██████░░░░  ~60% on SWE-bench\nWith harness:   ██████████  ~90%+ on SWE-bench\n\n            (same model, different wrapper)",
-          language: "text",
-          note: "Studies on coding benchmarks show that the scaffolding around a model — how it reads files, calls tools, retries errors, and manages context — can have a multiplicative impact beyond what the model achieves alone. Claude Code is Anthropic's answer to that harness problem.",
+          note: "Claude Code reads your project files and is ready to help. No config, no setup — just talk to it.",
         },
       ],
       terminal: [
@@ -214,6 +210,12 @@ export const sections: Section[] = [
           code: "# .claude/commands/daily-standup.md\n\nLook at today's git commits and open PRs, then\nwrite a short standup update for Slack:\n- What I did\n- What I'm doing today\n- Any blockers",
           language: "markdown",
           note: "Save this as a .md file — now you have /daily-standup",
+        },
+        {
+          label: "Building a real skill: anatomy and best practices",
+          code: "# .claude/commands/review.md\n# Usage: /review src/routes/auth.ts\n\nYou are doing a focused code review of: $ARGUMENTS\n\n## Steps\n1. Read the file at $ARGUMENTS\n2. Read CLAUDE.md to understand project conventions\n3. Check for:\n   - Logic errors or missing edge cases\n   - Unvalidated inputs at system boundaries\n   - Missing test coverage for new code paths\n   - Any violations of the patterns in CLAUDE.md\n\n## Output format\n### Summary\n[One sentence: what this code does]\n\n### Issues\n- [line N] — [description and suggested fix]\n\n### Looks good\n- [things the author did well]\n\nBe direct. Skip praise for things that are merely correct.",
+          language: "markdown",
+          note: "Use $ARGUMENTS to accept input when you invoke the skill — here, /review src/auth.ts passes the file path. Reference CLAUDE.md so the skill automatically stays in sync with your project's own conventions. Project skills live in .claude/commands/; global skills (available in every project) live in ~/.claude/commands/.",
         },
         {
           label: "MCP Servers: connect Claude to anything",
@@ -493,6 +495,43 @@ export const sections: Section[] = [
       callout: {
         type: 'tip',
         text: "The field moves fast enough that blog posts and X threads are often more current than books. Follow people who build things, not just people who write about building things.",
+      },
+    },
+  },
+  {
+    id: 'try-it-yourself',
+    title: 'Try It Yourself',
+    emoji: '🛠️',
+    tagline: 'What it costs, how to sign up, and what to build first',
+    content: {
+      intro:
+        "Claude Code is a paid tool, but getting started is cheap — $5 in API credits will last you through several real projects. Here's exactly what you need.",
+      steps: [
+        {
+          label: "Option A — Claude.ai Pro ($17/mo, easiest)",
+          code: "1. Sign up at claude.ai\n2. Upgrade to Pro ($17/month)\n3. npm install -g @anthropic-ai/claude-code\n4. claude  ← you're in",
+          language: "bash",
+          note: "Pro includes Claude Code within your subscription — no separate billing. Best if you plan to use it regularly.",
+        },
+        {
+          label: "Option B — API credits (pay-as-you-go, cheapest to start)",
+          code: "1. Sign up at console.anthropic.com\n2. Add $5–$20 in credits\n3. npm install -g @anthropic-ai/claude-code\n4. export ANTHROPIC_API_KEY=sk-ant-...\n5. claude",
+          language: "bash",
+          note: "$5 in credits goes a long way for light use — roughly 10–20 casual coding sessions at Sonnet pricing.",
+        },
+        {
+          label: "System requirements",
+          code: "node --version   # needs 18+\nnpm --version    # needs 8+\n# Works on macOS, Linux, and Windows (WSL recommended)",
+          language: "bash",
+        },
+        {
+          label: "What to build first",
+          note: "Best first project: something you actually need. A script to automate a tedious task, a REST API for a class project, a CLI tool for your workflow. Give Claude Code a real problem — that's when it shines.",
+        },
+      ],
+      callout: {
+        type: 'tip',
+        text: 'Start with API credits if you want to experiment before committing. Start with Pro if you\'re going to use it daily. Either way: the first hour of real use will teach you more than any tutorial.',
       },
     },
   },
