@@ -545,4 +545,50 @@ export const sections: Section[] = [
         "Vote for what we build live. Whichever option wins, we'll fire up Claude Code right now and build it from scratch — using the TDD and multiagent patterns we just covered.",
     },
   },
+  {
+    id: 'react-vite-primer',
+    title: 'React & Vite Primer',
+    emoji: '⚛️',
+    tagline: 'Backup slide — a quick foundation for understanding this site\'s stack',
+    content: {
+      intro:
+        "This site is built with React and Vite. If those names are new to you, here's the 5-minute version.",
+      steps: [
+        {
+          label: "React: UI as a tree of components",
+          code: "// A component is just a function that returns UI\nfunction Greeting({ name }: { name: string }) {\n  return <h1>Hello, {name}!</h1>  // JSX — HTML-in-JS\n}\n\n// Compose components like HTML tags\nfunction App() {\n  return (\n    <div>\n      <Greeting name=\"CS students\" />\n      <Greeting name=\"everyone else\" />\n    </div>\n  )\n}",
+          language: "tsx",
+          note: "JSX looks like HTML but it's JavaScript. React turns your component tree into actual DOM nodes in the browser.",
+        },
+        {
+          label: "State: data that triggers re-renders",
+          code: "import { useState } from 'react'\n\nfunction Counter() {\n  const [count, setCount] = useState(0)  // [value, setter]\n\n  return (\n    <button onClick={() => setCount(count + 1)}>\n      Clicked {count} times\n    </button>\n  )\n}",
+          language: "tsx",
+          note: "When you call setCount(), React re-renders only the components that depend on that state. Everything else stays untouched.",
+        },
+        {
+          label: "Effects: sync with the outside world",
+          code: "import { useEffect, useState } from 'react'\n\nfunction UserProfile({ userId }: { userId: string }) {\n  const [user, setUser] = useState(null)\n\n  useEffect(() => {\n    fetch(`/api/users/${userId}`)\n      .then(r => r.json())\n      .then(setUser)\n  }, [userId])  // re-runs when userId changes\n\n  return user ? <div>{user.name}</div> : <div>Loading...</div>\n}",
+          language: "tsx",
+          note: "useEffect runs after render. The dependency array controls when it re-runs. Omit it and it runs every render; pass [] and it runs once on mount.",
+        },
+        {
+          label: "Vite: the build tool that replaced webpack",
+          code: "# Create a new React + TypeScript project\nnpm create vite@latest my-app -- --template react-ts\ncd my-app\nnpm install\nnpm run dev   # starts dev server at localhost:5173\n\n# What Vite does:\n# dev:   serves files with native ES modules — instant startup\n# build: bundles everything into optimized static files\n# preview: serves the production build locally",
+          language: "bash",
+          note: "Vite's dev server uses native browser ES modules — no bundling step during development. Hot Module Replacement (HMR) means edits appear in the browser in milliseconds.",
+        },
+        {
+          label: "How React + Vite fit together",
+          code: "my-app/\n├── index.html          ← Vite entry point\n├── vite.config.ts      ← Vite config (plugins, aliases)\n├── src/\n│   ├── main.tsx        ← mounts <App /> into index.html\n│   ├── App.tsx         ← root React component\n│   └── components/     ← your component files\n└── package.json\n\n# The flow:\n# Browser loads index.html\n#   → Vite serves main.tsx as an ES module\n#   → React renders <App /> into <div id=\"root\">\n#   → Your components take over",
+          language: "text",
+          note: "This site follows exactly this structure. The sections data lives in src/data/sections.ts — Claude Code wrote every line of it from a single prompt.",
+        },
+      ],
+      callout: {
+        type: 'info',
+        text: 'React handles what the UI looks like and how it updates. Vite handles how the code gets from your editor to the browser. They solve different problems and work great together.',
+      },
+    },
+  },
 ]
