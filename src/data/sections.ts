@@ -364,7 +364,7 @@ export const sections: Section[] = [
         },
         {
           label: "Agent SDK: build your own multiagent system",
-          code: "import Anthropic from '@anthropic-ai/sdk'\n\nconst client = new Anthropic()\n\n// Orchestrator asks Claude to spawn workers\nconst response = await client.messages.create({\n  model: 'claude-sonnet-4-6',\n  max_tokens: 8096,\n  tools: [spawnAgentTool, readFileTool, writeFileTool],\n  messages: [{\n    role: 'user',\n    content: 'Review all 12 endpoint files in parallel and report issues'\n  }]\n})",
+          code: "import Anthropic from '@anthropic-ai/sdk'\n\nconst client = new Anthropic()\n\n// Orchestrator asks Claude to spawn workers\nconst response = await client.messages.create({\n  model: 'claude-sonnet-4-6',\n  max_tokens: 8192,\n  tools: [spawnAgentTool, readFileTool, writeFileTool],\n  messages: [{\n    role: 'user',\n    content: 'Review all 12 endpoint files in parallel and report issues'\n  }]\n})",
           language: "typescript",
         },
         {
